@@ -1,0 +1,51 @@
+version: '3.9'
+
+volumes:
+  postgres_data:
+
+services:
+
+  frontend:
+    container_name: lepp-nginx
+    build:
+      context: etc/docker/nginx
+      network: host
+    volumes:
+      - .:/web
+      - ./etc/docker/nginx/conf.d/:/etc/nginx/conf.d/
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - php
+
+  php:
+    container_name: lepp-php
+    build:
+      context: etc/docker/php
+      network: host
+      args:
+        DC_USER_ID: 1000
+        DC_GROUP_ID: 1000
+    volumes:
+      - .:/web
+      - ./etc/docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+    depends_on:
+      - postgres
+    environment:
+      TERM: 'xterm-256color'
+      PHP_IDE_CONFIG: 'serverName=lepp.local'
+
+  postgres:
+    container_name: lepp-postgres
+    image: 'postgres:13'
+    volumes:
+      - ./etc/docker/postgres/initdb.d/:/docker-entrypoint-initdb.d/
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD=: rust
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: passw0rd
+      PGDATA: /var/lib/postgresql/data/pgdata
