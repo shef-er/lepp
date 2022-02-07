@@ -45,7 +45,7 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_HOST_AUTH_METHOD=: trust
+      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_USER: root
       POSTGRES_PASSWORD: passw0rd
       PGDATA: /var/lib/postgresql/data/pgdata
